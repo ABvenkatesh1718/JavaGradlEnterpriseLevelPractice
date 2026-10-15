@@ -1,19 +1,19 @@
 spring:
   application:
     name: EnterpriseLevelPractice
-config:
-  import:
-    # Reads the directory from the EXT_CONFIG_DIR env variable.
-    # If absent, falls back to optional local path or skips cleanly.
-    - optional:file:${EXT_CONFIG_DIR:P:/Java/SpringBoot/KeySecrets}/db-secret.yaml}
-
   jpa:
     hibernate:
-      ddl-auto: none # Schema generation disabled; Liquibase will control it in Stage 2
-    open-in-view: false # Release connections immediately after transaction completion
+      ddl-auto: validate
+    open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect # Fixed: dialect spelling
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  config:
+    import:
+      - "optional:file:${EXT_CONFIG_DIR:P:/Java/SpringBoot/KeySecrets}/db-secret.yaml"
+#  liquidbase:
+#    enabled: true
+#    change-log: classpath:db/changelog/db.changelog-master.yaml
 
 # Sensible fallbacks if the external file is absent
 boot:

@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changes/001-create-users-table.yaml
+  - include:
+      file: db/changelog/changes/002-rename-email-to-gmail.yaml
+  - include:
+      file: db/changelog/changes/003-add-is-active-column.yaml

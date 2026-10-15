@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-rename-users-email-to-gmail
+      author: venkatesh
+      changes:
+        - renameColumn:
+            tableName: users
+            oldColumnName: email
+            newColumnName: gmail
+            columnDataType: VARCHAR(150)
