@@ -2,8 +2,11 @@ package com.venkatesh.enterpriselevelpractice.config;
 
 
 import com.zaxxer.hikari.HikariDataSource;
+import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.boot.jpa.autoconfigure.EntityManagerFactoryDependsOnPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -40,6 +43,7 @@ public class DataSourceConfig {
     @Bean
     @Primary
     public DataSource dataSource() {
+        System.out.println(">>> [STEP 1] Creating Hikari DataSource Bean...");
         HikariDataSource hikariDataSource = DataSourceBuilder.create()
                 .type(HikariDataSource.class)
                 .driverClassName(driverClassName)
@@ -63,5 +67,25 @@ public class DataSourceConfig {
     @Primary
     public JdbcTemplate jdbcTemplate(DataSource dataSource) {
         return new JdbcTemplate(dataSource);
+    }
+
+    /**
+     * Explicitly forces Liquibase to run migrations using our custom DataSource.
+     */
+    @Bean
+    public SpringLiquibase liquibase(DataSource dataSource) {
+        System.out.println(">>> [STEP 2] Creating SpringLiquibase Bean using DataSource: " + dataSource.getClass().getSimpleName());
+        SpringLiquibase liquibase = new SpringLiquibase();
+        liquibase.setDataSource(dataSource);
+        liquibase.setChangeLog("classpath:db/changelog/db.changelog-master.yaml");
+        return liquibase;
+    }
+    /**
+     * Guarantees that the JPA EntityManagerFactory is initialized ONLY AFTER
+     * the 'liquibase' bean has completed all migrations.
+     */
+    @Bean
+    public static BeanFactoryPostProcessor entityManagerFactoryDependsOnLiquibasePostProcessor() {
+        return new EntityManagerFactoryDependsOnPostProcessor("liquibase");
     }
 }
